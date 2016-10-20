@@ -1,0 +1,98 @@
+﻿@model ChatWeb.Models.ChatUser
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>ChatUsers : Details</h2>
+
+<div>
+    <h4>ChatUser</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.user_id)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.user_id)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.user_name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.user_name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.pwd)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.pwd)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.user_email)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.user_email)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.user_type)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.user_type)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.phone_number)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.phone_number)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.online_state)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.online_state)
+        </dd>        
+
+        @*<dt>
+            @Html.DisplayNameFor(model => model.contact_list)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.contact_list)
+        </dd>*@
+
+        <dt>
+            @Html.DisplayNameFor(model => model.room_list)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.room_list)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.device_id)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.device_id)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.ID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

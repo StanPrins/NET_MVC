@@ -1,0 +1,96 @@
+﻿@*@model IEnumerable<ChatWeb.Models.ChatUser>*@
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<input type="hidden" id="user_id" value="@ViewBag.user_id" />
+<input type="hidden" id="auth_token" value="@ViewBag.auth_token" />
+<div class="col-md-offset-2 col-md-10">
+    
+    <input id="roomButton" type="button" value="Rooms" class="btn btn-default" />
+    <input id="logoutButton" type="button" value="LogOut" class="btn btn-default" />
+</div>
+<p>
+    <h2>
+        Contacts 
+        </h2>
+</p>
+<div id="status"></div>
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <hr />
+        <table id="myTable" class="hidden">
+            
+            <tr class="row">
+                <th class="col-md-2">
+                    User ID
+                </th>
+       
+                <th class="col-md-2">
+                    User Name
+                </th>
+        
+                <th class="col-md-2">
+                    Online
+                </th>      
+            </tr>
+        </table>
+        
+}
+<script src="~/Scripts/jquery-2.1.4.js"></script>
+<script type="text/javascript">
+    var user_id = $('#user_id').val();
+    var auth_token = $('#auth_token').val();
+    var table = document.getElementById('myTable');
+    var root = location.protocol + '//' + location.host;
+    function selectOperator(x) {
+
+        var receiver_id = table.rows[x.rowIndex].cells[0].innerHTML;
+        var receiver_name = table.rows[x.rowIndex].cells[1].innerHTML;
+        
+        location.href = root + "/chat/chat?user_id=" + user_id + "&receiver_id=" +receiver_id+ "&receiver_name=" + receiver_name + "&auth_token=" + auth_token;
+
+    }
+    function getOperators(user_id, auth_token) {
+        $.ajax({
+            type: 'GET',
+            url: '/api/chats/contacts?user_id=' + user_id + "&auth_token=" + auth_token,
+            contentType: 'application/json',
+            dataType: 'json',
+            error: function (response, status) {
+                alert(response.responseText);
+            },
+            success: function (result) {
+                
+                var data = result.operators;
+                if (data) {
+                    var len = data.length;
+                    var txt = "";
+                    if (len > 0) {
+                        for (var i = 0; i < len; i++) {
+                            if (data[i].receiver_id && data[i].receiver_name ) {
+                                txt += "<tr onclick='selectOperator(this)' class='row'><td class='col-md-2'>" + data[i].receiver_id + "</td><td class='col-md-2'>" + data[i].receiver_name + "</td><td class='col-md-2'>" + data[i].online_state + "</td></tr>";
+                            }
+                        }
+                        if (txt != "") {
+                            $("#myTable").append(txt).removeClass("hidden");
+                        }
+                    }
+                }
+
+            }
+        })
+    }
+    
+    $(document).ready(function () {      
+        
+        getOperators(user_id, auth_token);
+        $('#roomButton').click(function () {
+            location.href = root + "/Chat/RoomList?user_id=" + user_id + "&auth_token=" + auth_token;
+        });
+        $('#logoutButton').click(function () {
+            location.href = root + "/Chat/ChatLogout?user_id=" + user_id + "&auth_token=" + auth_token;
+        });
+    })  
+</script>

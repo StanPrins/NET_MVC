@@ -1,0 +1,96 @@
+﻿@model IEnumerable<ChatWeb.Models.Result_Message>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Messages : Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+    
+</p>
+<table class="table">
+    <tr>
+        @*<th>
+            @Html.DisplayNameFor(model => model.message_id)
+        </th>*@
+        <th>
+            @Html.DisplayNameFor(model => model.room_id)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.sender_id)
+        </th>
+        @*<th>
+            @Html.DisplayNameFor(model => model.receiver_id)
+        </th>*@
+        <th>
+            @Html.DisplayNameFor(model => model.sender_date)
+        </th>
+        @*<th>
+            @Html.DisplayNameFor(model => model.receiver_date)
+        </th>*@
+        <th width="col-md-2">
+            @Html.DisplayNameFor(model => model.context)
+        </th>
+        <th>Action
+            <div class="col-md-offset-2 col-md-10">
+                <input id="prevButton" type="button" value="<" class="btn btn-default" />
+                @ViewBag.npage
+                <input id="nextButton" type="button" value=">" class="btn btn-default" />
+            </div>
+        </th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        @*<td>
+            @Html.DisplayFor(modelItem => item.message_id)
+        </td>*@
+        <td>
+            @Html.DisplayFor(modelItem => item.room_id)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.sender_id)
+        </td>
+        @*<td>
+            @Html.DisplayFor(modelItem => item.receiver_id)
+        </td>*@
+        <td>
+            @Html.DisplayFor(modelItem => item.sender_date)
+        </td>
+        @*<td>
+            @Html.DisplayFor(modelItem => item.receiver_date)
+        </td>*@
+        <td>
+            @Html.DisplayFor(modelItem => item.context)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.ID }) |
+            @Html.ActionLink("Details", "Details", new { id=item.ID }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.ID })
+        </td>
+    </tr>
+}
+
+</table>
+<script src="~/Scripts/jquery-2.1.4.min.js"></script>
+
+<script>
+    var npage = 0;
+    
+    var root = location.protocol + '//' + location.host;
+    
+    
+    $("#prevButton").click(function () {
+        npage = npage - 1;
+        if (npage < 0)
+            npage = 0;
+        location.href = root + "/Messages/Index/" + npage;
+    });
+    $('#nextButton').click(function () {
+        npage = npage + 1;
+        location.href = root + "/Messages/Index/" +npage;
+    });
+    
+</script>

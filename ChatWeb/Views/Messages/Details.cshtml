@@ -1,0 +1,74 @@
+﻿@model ChatWeb.Models.Message
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Messages : Details</h2>
+
+<div>
+    <h4>Message</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.message_id)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.message_id)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.room_id)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.room_id)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.sender_id)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.sender_id)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.receiver_id)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.receiver_id)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.sender_date)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.sender_date)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.receiver_date)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.receiver_date)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.context)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.context)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.ID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

@@ -1,0 +1,40 @@
+﻿@*@model ChatWeb.Models.ChatUser*@
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "ChatLoginSuccess";
+}
+
+<div class="col-md-offset-2 col-md-10">
+    <input id="contactButton" type="button" value="Contacts" class="btn btn-default" />
+    <input id="roomButton" type="button" value="Rooms" class="btn btn-default" />
+    <input id="logoutButton" type="button" value="LogOut" class="btn btn-default" />
+
+</div>
+<br />
+<br />
+<hr />
+    <div class="text-center">
+        
+        <h2>Welcome to "@ViewBag.user_id"  !</h2>
+        
+      </div>
+
+    <input type="hidden" id="user_id" value="@ViewBag.user_id"/>
+    <input type="hidden" id="auth_token" value="@ViewBag.auth_token"/>
+    <script src="~/Scripts/jquery-2.1.4.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            var user_id = $('#user_id').val();
+            var auth_token = $('#auth_token').val();
+            var root = location.protocol + '//' + location.host;
+            $('#contactButton').click(function () {
+                location.href = root + "/Chat/OperatorList?user_id=" + user_id + "&auth_token=" + auth_token;
+            });
+            $('#roomButton').click(function () {
+                location.href = root + "/Chat/RoomList?user_id=" + user_id + "&auth_token=" + auth_token;
+            });
+            $('#logoutButton').click(function () {
+                location.href = root + "/Chat/ChatLogout?user_id=" + user_id + "&auth_token=" + auth_token;
+            });
+        })
+    </script>

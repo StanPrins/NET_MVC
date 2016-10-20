@@ -1,0 +1,211 @@
+﻿@{
+    ViewBag.Title = "Chat";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    //Layout = null;
+}
+
+<style type="text/css">
+    .chat-container {
+        background-color: #99CCFF;
+        border: thick solid #808080;
+        padding: 20px;
+        margin: 20px;
+    }
+</style>
+
+<div class="col-md-offset-2 col-md-10">
+    <input id="contactButton" type="button" value="Contacts" class="btn btn-default" />
+    <input id="roomButton" type="button" value="Rooms" class="btn btn-default" />
+    <input id="logoutButton" type="button" value="LogOut" class="btn btn-default" />
+
+</div>
+
+<p>
+    <h3>
+        Chatting Page
+    </h3>
+</p>
+<input type="hidden" id="userid" value=@ViewBag.user_id />
+@*<input type="hidden" id="roomid" value=@ViewBag.room_id />*@
+<input type="hidden" id="receiver_name" value=@ViewBag.receiver_name />
+<input type="hidden" id="auth_token" value="@ViewBag.auth_token" />    
+<h4>Me : @ViewBag.user_id</h4><br />
+<h4>receiver : @ViewBag.receiver_id</h4><h4>(name : @ViewBag.receiver_name )</h4>
+
+<div class="chat-container">
+    Room Name : @ViewBag.receiver_name<br />
+    Message : <input type="text" id="message" /><input type="button" id="sendmessage" value="Send" />   
+    count : <input type="text" id="status" value="10" disabled="disabled" /> <input type="button" id="refreshButton" value="+" />
+    
+    <ul id="discussion"></ul>
+</div>
+
+<input type="hidden" id="user_id" value="@ViewBag.user_id" />
+<input type="hidden" id="receiver_id" value="@ViewBag.receiver_id" />
+
+
+
+<div id="public_chat_area" class="chat-container hidden">
+    Room Name : PUBLIC_ROOM<br />
+    Message : <input type="text" id="message_public" /><input type="button" id="sendmessage_public" value="Send" />
+    (when invite or receiver is offline )
+    <ul id="discussion_public"></ul>
+</div>
+    <script src="~/Scripts/jquery-2.1.4.js"></script>
+    <script src="~/Scripts/jquery.signalR-2.2.1.min.js"></script>
+    <script src="~/signalr/hubs"></script>
+
+    <script type="text/javascript">
+        var root = location.protocol + '//' + location.host;
+        var txt = "";
+        var publicroomid = 'PUBLIC_ROOM';
+        var user_id = $('#user_id').val();
+        var receiver_id = $('#receiver_id').val();
+        var auth_token = $('#auth_token').val();
+        var room_id = "";
+        var time=0;
+        var count = 0;
+        var $nCount =$("#status");
+       
+        $('#refreshButton').click(function () {
+            count = count + 10;
+             //$('#discussion').empty();
+             
+            getMsg(room_id, user_id, receiver_id, auth_token, time, count);
+        });
+      
+      
+        function getMsg(room_id,user_id,receiver_id, auth_token, time, count)
+        {  
+            var d = new Date();
+            var delta = d.getTimezoneOffset() * 60 * 1000 * 1000;
+            var jdata = {
+                room_id: room_id,
+                user_id: user_id,
+                receiver_id: receiver_id,
+                auth_token:auth_token,                
+                time: time,
+                count: count
+            };
+            
+            ///// REST function -----start---- 
+            $.ajax({
+                type: 'POST',
+                url: '/api/chats/messages',
+                contentType: 'application/json',
+                dataType: 'json',
+                data: JSON.stringify(jdata),
+                error: function (response, status) {
+                    alert(response.responseText);
+                },
+                success: function (result) {
+                    if (result.state == 0) {
+                        room_id = result.room_id;
+                        var data = result.message;
+                        if (data != "")
+                        {
+                            $('#discussion').empty();
+                            var d = new Date();
+                            //var tzoff = d.getTimezoneOffset();
+                            //var delta = d.getTimezoneOffset() * 60 * 1000 * 1000;
+                            var len = data.length;
+                            count = count + len;
+                            var temp = txt;
+                            txt = "";
+                            $nCount.val(count);
+                           
+                            if (len > 0) {
+                                for (var i = 0; i < len; i++) {
+                                    if (data[i].context && data[i].sender_id && data[i].sender_date)
+                                    {//+ newDate.getTimezoneOffset() * 60 * 1000                                      
+                                        
+                                        var head = $('<div/>').text(data[i].sender_id + ":" + data[i].sender_date).html();
+                                        var con= $('<div  />').text(data[i].context).html();
+                                        txt  = txt +'<li><strong>' + head +'</strong>: ' +con +'</li>';
+
+                                    }
+                                }
+                            }
+                            txt = txt + temp;
+                            $('#discussion').append(txt);
+                        }
+                        
+                        var chat = $.connection.ChatHub;
+                        chat.qs = { 'version': '1.0' };
+                        chat.client.getMessage = function (sendername, message, room_id, strdate) {
+                            count = count + 1;
+                            $nCount.val(count);
+                            var encodedName = $('<div />').text(sendername + " : " + strdate).html();                            
+                            var encodedMsg = $('<div  />').text(message).html();                            
+                            if (room_id == "PUBLIC_ROOM") {
+                                $('#public_chat_area').removeClass('hidden');
+                                $('#discussion_public').append('<li><strong>' + encodedName
+                                + '</strong>:  ' + encodedMsg +'</li>');
+                            } else
+
+                                $('#discussion').append('<li><strong>' + encodedName
+                                    + '</strong>:  ' + encodedMsg + '</li>');
+                        };
+                        
+                        $('#message').focus();
+                        $.connection.hub.qs = { 'user_id': user_id };
+                        $.connection.hub.start().done(function () {
+                            chat.server.joinRoom(result.room_id);
+                            chat.server.joinRoom(publicroomid);
+                            
+                            $('#sendmessage_public').click(function () {
+                                if (!$('#message_public').val()) return;
+                                chat.server.sendMessage($('#userid').val(), $('#message_public').val(), publicroomid, new Date().getTime());
+
+                                $('#message_public').val('').focus();
+                            });
+                            
+                            $('#sendmessage').click(function () {
+                                if (!$('#message').val()) return;
+                                chat.server.sendMessage($('#userid').val(), $('#message').val(), room_id, new Date().getTime());
+                                $('#message').val('').focus();
+                            });
+                            var $msgTxt = $('#message'),
+                                $sendBtn = $('#sendmessage');
+                            $msgTxt.keypress(function (e) {
+                                var code = (e.keyCode ? e.keyCode : e.which);
+                                if (code === 13) {
+                                    if (!$('#message').val()) return;
+                                    chat.server.sendMessage($('#userid').val(), $('#message').val(), room_id, new Date().getTime());
+                                    $('#message').val('').focus();
+                                }
+                            });
+                        });
+                    } else {
+                        if(result.state == 5)
+                            $('#status').val() = result.auth_token;
+                        location.href = root + "/Chat/ChatLoginSuccess?user_id=" + user_id + "&auth_token=" + auth_token;
+                    }
+                }
+            })
+            ///// REST function -----end---- 
+
+        }
+        
+        $(function () {
+          
+           
+            getMsg(room_id, user_id, receiver_id, auth_token, time, count);
+            
+
+            $('#contactButton').click(function () {
+                location.href = root + "/Chat/OperatorList?user_id=" + user_id + "&auth_token=" + auth_token;
+            });
+            $('#roomButton').click(function () {
+                location.href = root + "/Chat/RoomList?user_id=" + user_id + "&auth_token=" + auth_token;
+            });
+            $('#logoutButton').click(function () {
+              
+                location.href = root + "/Chat/ChatLogout?user_id=" + user_id + "&auth_token=" + auth_token;
+            });
+           
+           
+
+          
+        });
+    </script>

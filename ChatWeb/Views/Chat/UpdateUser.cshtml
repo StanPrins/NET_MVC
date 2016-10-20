@@ -1,0 +1,31 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<U>@Html.ActionLink("Message", "Index", "Chat")</U> &nbsp;&nbsp;
+<U>@Html.ActionLink("Rooms View", "RoomList", "Chat")</U>&nbsp;&nbsp;
+<U>@Html.ActionLink("Operators View", "OperatorList", "Chat")</U>&nbsp;&nbsp;
+<U>@Html.ActionLink("Chat Logout", "ChatLogout", "Chat")</U>
+<p>Chat Users Register here!</p>
+
+User Name: <input type="text" id="userName" /><br />
+<br />
+Old Password : <input type="text" id="oldPwd" /><br />
+<br />
+New Password : <input type="text" id="newPwd" /><br />
+<br />
+phone : <input type="text" id="phoneNumer" /><br />
+<br />
+email : <input type="text" id="userEmail" /><br />
+<br />
+
+<input type="button" value="Update" id="updateProfile" />
+
+<script src="~/Scripts/jquery-2.1.4.min.js"></script>
+<script>
+    $(function () {
+        $('#updateProfile').click(function () {
+            var root = location.protocol + '//' + location.host;
+            location.href = root +"/Chat/ChatLogin";
+        });
+    });
+</script>

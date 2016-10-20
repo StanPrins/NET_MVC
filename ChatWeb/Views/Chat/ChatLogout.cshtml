@@ -1,0 +1,54 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<input type="hidden" id="user_id" value="@ViewBag.user_id" />
+<input type="hidden" id="auth_token" value="@ViewBag.auth_token" />
+<div class="col-md-offset-2 col-md-10">
+
+    <input id="loginButton" type="button" value="Login" class="btn btn-default" />
+    <input id="registerButton" type="button" value="Register" class="btn btn-default" />
+</div>
+
+<p>
+    
+    <hr /><br />
+        <div id="state" class="hidden text-center ">
+            
+        </div>
+    
+</p>
+<script src="~/Scripts/jquery-2.1.4.min.js"></script>
+<script>
+    var user_id = $('#user_id').val();
+    var auth_token = $('#auth_token').val();
+    function Logout(user_id, auth_token) {
+        $.ajax({
+            type: 'GET',
+            url: '/api/chats/user/logout?user_id=' + user_id + "&auth_token=" + auth_token,
+            contentType: 'application/json',
+            dataType: 'json',
+            error: function (response, status) {
+                alert(response.responseText);
+            },
+            success: function (result) {
+                if(result.state ==0)
+                    $("#state").append("<hr/><h2>See you again!</h2>").removeClass("hidden");                
+                else
+                    $("#state").append("logout failed").removeClass("hidden");
+            }
+        })
+    }
+        $(document).ready(function () {
+            
+            Logout(user_id, auth_token);
+            var root = location.protocol + '//' + location.host;
+            $('#loginButton').click(function () {
+                location.href = root + "/Chat/ChatLogin";
+            });
+            $('#registerButton').click(function () {
+                location.href = root + "/Chat/ChatRegister";
+            });
+            
+        })
+</script>

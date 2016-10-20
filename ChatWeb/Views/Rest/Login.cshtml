@@ -1,0 +1,154 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+    <div> 
+        <table id="login">
+            <tbody>
+                <tr>
+                    <td>User Name:</td>
+                    <td><input id="userId" type="text" /></td>
+                </tr>
+                <tr>
+                    <td>Password:</td>
+                    <td><input id="password" type="text" /></td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <input id="loginButton" type="button" value="Login" />
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div id="status"></div>
+    <div>
+        <table id="roomsTable" class="hidden">
+            <tr>
+                <th class="hidden">room_id</th>
+                <th>room_name</th>
+                <th>member_list</th>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <table id="operatorsTable" class="hidden">
+            <tr>
+                <th>receiver_id</th>
+                <th>receiver_name</th>
+            </tr>
+        </table>
+    </div>
+
+<script src="~/Scripts/jquery-2.1.4.min.js"></script>
+<script>
+    var auth_token = '';
+    var user_id = '';
+    var table = document.getElementById('operatorsTable');
+    function selectOperator(x) {
+        var uid = table.rows[x.rowIndex].cells[0].innerHTML;
+    }
+    function getOperators(user_id, auth_token) {
+        $.ajax({
+            type: 'GET',
+            url: '/api/chats/contacts?user_id=' + user_id + "&auth_token=" + auth_token,
+            contentType: 'application/json',
+            dataType: 'json',
+            error: function (response, status) {
+                alert(response.responseText);
+            },
+            success: function (result) {
+                //$("#operatorsTable").val = result.operators;
+                var data = result.operators;
+                if (data) {
+                    var len = data.length;
+                    var txt = "";
+                    if (len > 0) {
+                        for (var i = 0; i < len; i++) {
+                            if (data[i].receiver_id && data[i].receiver_name) {
+                                txt += "<tr onclick='selectOperator(this)'><td>" + data[i].receiver_id + "</td><td>" + data[i].receiver_name + "</td></tr>";
+                            }
+                        }
+                        if (txt != "") {
+                            $("#operatorsTable").append(txt).removeClass("hidden");
+                        }
+                    }
+                }
+                getRooms(user_id, auth_token);
+            }
+        })
+    }
+    function getRooms(user_id, auth_token) {
+        $.ajax({
+            type: 'GET',
+            url: '/api/chats/rooms?user_id=' + user_id + "&auth_token=" + auth_token,
+            contentType: 'application/json',
+            dataType: 'json',
+            error: function (response, status) {
+                alert(response.responseText);
+            },
+            success: function (result) {
+                //$("#operatorsTable").val = result.operators;
+                var data = result.rooms;
+                if (data) {
+                    var len = data.length;
+                    var txt = "";
+                    if (len > 0) {
+                        for (var i = 0; i < len; i++) {
+                            if (data[i].room_id && data[i].receiver_name && data[i].member_list) {
+                                txt += "<tr><td>" + data[i].room_id + "</td><td>" + data[i].receiver_name + "</td><td>" + data[i].member_list + "</td></tr>";
+                            }
+                        }
+                        if (txt != "") {
+                            $("#roomsTable").append(txt).removeClass("hidden");
+                        }
+                    }
+                }
+            }
+        })
+
+    }
+
+    function login(userId, password) {
+        var d = new Date();
+        var delta = d.getTimezoneOffset()*60*1000*1000;
+        var auth = {
+            user_id: userId,
+            pwd: password,
+            user_email: '',
+            offset_time:delta 
+        };
+        //"108000000000"
+        $.ajax({
+            type: 'POST',
+            url: '/api/chats/user/login',
+            contentType: 'application/json',
+            dataType: 'json',
+            data: JSON.stringify(auth),
+            error: function(response, status) {
+                alert(response.responseText);
+            },
+            success: function (result) {
+                if (result.state == 0) {
+                    $("#status")[0].innerHtml = "AUTH TOKEN: " + result.auth_token;
+                    auth_token = result.auth_token;
+                    user_id = userId;
+                    getOperators(userId, auth_token);
+                } else {
+                    $("#status")[0].innerText = "LOGIN FAILED, STATUS: " + result.state;
+                }
+            }
+        })
+    }
+
+    $(document).ready(function () {
+        $("#loginButton").click(function () {
+            var userId = $("#userId").val();
+            var password = $("#password").val();
+            login(userId, password);
+        })
+    })
+</script>

@@ -1,0 +1,133 @@
+﻿@*@model ChatWeb.Models.ChatUser*@
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@*<U>@Html.ActionLink("Chat Login", "ChatLogin", "Chat")</U> &nbsp;&nbsp;*@
+
+<p><h3>
+    Chat Users register here!
+    </h3>
+    </p>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        
+        <hr />
+
+        <div class="form-group">
+            <span class="control-label col-md-2">*User ID:</span>
+
+            <div class="col-md-10">
+
+                <input id="userId" type="text" />
+            </div>
+
+        </div>
+
+        <div class="form-group">
+            <span class="control-label col-md-2">*User Name:</span>
+
+            <div class="col-md-10">
+
+                <input id="userName" type="text" />
+            </div>
+
+        </div>
+        <div class="form-group">
+            <span class="control-label col-md-2">*Password:</span>
+            <div class="col-md-10">
+                <input id="password" type="text" />
+            </div>
+
+        </div>
+
+        <div class="form-group">
+            <span class="control-label col-md-2">*User Email:</span>
+
+            <div class="col-md-10">
+
+                <input id="email" type="text" />
+            </div>
+
+        </div>  
+        
+        <div class="form-group">
+            <span class="control-label col-md-2">Phone Number:</span>
+
+            <div class="col-md-10">
+
+                <input id="phoneNumber" type="text" />
+            </div>
+
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input id="registerButton" type="button" value="Chat Register" class="btn btn-default" />
+                <input id="chatLogin" type="button" value="Login"  class="btn btn-default" />
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-12">
+                <div id="status"></div>
+            </div>
+        </div>
+    </div>
+}
+
+
+
+<script src="~/Scripts/jquery-2.1.4.min.js"></script>
+<script>
+    function Register(user_id, user_name, pwd, user_email, phone_number) {
+        
+        var jdata = {
+            user_id: user_id,
+            user_name: user_name,
+            pwd: pwd,
+            user_email: user_email,
+            phone_number: phone_number,
+            device_id:''
+        };
+        $.ajax({
+            type: 'POST',
+            url: '/api/chats/user/register',
+            contentType: 'application/json',
+            dataType: 'json',
+            data: JSON.stringify(jdata),
+            error: function (response, status) {
+                alert(response.responseText);
+            },
+            success: function (result) {
+                if (result.state == 0) {
+                    $("#status")[0].innerHtml = "AUTH TOKEN: " + result.auth_token;
+                    auth_token = result.auth_token;
+                    user_id = result.user_id;
+                    //getOperators(userId, auth_token);
+                    var root = location.protocol + '//' + location.host;
+                    location.href = root + "/Chat/OperatorList?user_id=" + user_id + "&auth_token=" + auth_token;
+                } else {
+                    $("#status")[0].innerText = "REGISTER FAILED, STATUS: " + result.state;
+                }
+            }
+        })
+    }
+    $(document).ready(function (){
+        $('#registerButton').click(function () {
+            var user_id = $("#userId").val();
+            var user_name = $("#userName").val();            
+            var pwd = $("#password").val();
+            var user_email = $("#email").val();
+            var phone_number = $("#phoneNumber").val();
+            Register(user_id, user_name, pwd, user_email, phone_number);
+        });
+        $('#chatLogin').click(function () {
+            var root = location.protocol + '//' + location.host;
+            location.href = root +"/Chat/ChatLogin";
+        });
+
+    })
+</script>

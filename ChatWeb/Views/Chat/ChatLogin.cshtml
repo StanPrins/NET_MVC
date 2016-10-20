@@ -1,0 +1,98 @@
+﻿@model ChatWeb.Models.ChatUser
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@*<U>@Html.ActionLink("Register", "ChatRegister", "Chat")</U> &nbsp;&nbsp;*@
+
+<p><h3>Chat Users login here!</h3></p>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    
+    <div class="form-horizontal">
+        <hr />
+        
+        <div class="form-group">
+            <span class = "control-label col-md-2" >User ID:</span>
+            
+            <div class="col-md-10">
+                
+                <input id="userId" type="text" />
+            </div>
+                
+        </div>
+        <div class="form-group">
+            <span class="control-label col-md-2">Password:</span>
+            <div class="col-md-10">
+                <input id="password" type="password" />
+            </div>
+               
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input id="loginButton" type="button" value="Chat Login" class="btn btn-default" />
+                <input id="registerButton" type="button" value="Chat Register" class="btn btn-default" />
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-12">
+                <div id="status"></div>
+            </div>
+        </div>
+
+    </div>
+}
+
+
+
+
+<script src="~/Scripts/jquery-2.1.4.min.js"></script>
+
+<script>
+    function login(userId, password) {                
+        var jdata = {
+            user_id: userId,
+            pwd: password,
+            user_email:'',            
+            user_name:'',
+            device_id:''
+        };
+        //"108000000000"
+        $.ajax({
+            type: 'POST',
+            url: '/api/chats/user/login',
+            contentType: 'application/json',
+            dataType: 'json',
+            data: JSON.stringify(jdata),
+            error: function (response, status) {
+                alert(response.responseText);
+            },
+            success: function (result) {
+                if (result.state == 0) {
+                    $("#status")[0].innerHtml = "AUTH TOKEN: " + result.auth_token;
+                    auth_token = result.auth_token;
+                    user_id = result.user_id;
+                    //getOperators(userId, auth_token);
+                    var root = location.protocol + '//' + location.host;
+                    location.href = root + "/Chat/ChatLoginSuccess?user_id="+user_id+"&auth_token="+auth_token;
+                } else {
+                    $("#status")[0].innerText = "LOGIN FAILED, STATUS: " + result.state  ;
+                }
+            }
+        })
+    }
+    $(document).ready(function () {
+        $("#loginButton").click(function () {
+            var userId = $("#userId").val();
+            var password = $("#password").val();
+            login(userId, password);
+        });
+        $('#registerButton').click(function () {
+            var root = location.protocol + '//' + location.host;
+            location.href = root + "/Chat/ChatRegister";
+        });
+    })
+
+</script>

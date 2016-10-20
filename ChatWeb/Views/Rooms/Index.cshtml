@@ -1,0 +1,57 @@
+﻿@model IEnumerable<ChatWeb.Models.Room>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Rooms : Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.room_id)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.room_name)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.owner_id)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.member_list)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.make_date)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.room_id)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.room_name)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.owner_id)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.member_list)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.make_date)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.ID }) |
+            @Html.ActionLink("Details", "Details", new { id=item.ID }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.ID })
+        </td>
+    </tr>
+}
+
+</table>
